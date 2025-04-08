@@ -1,0 +1,393 @@
+Comandos usados practica 1
+
+==================================================================================
+
+Paso 1: Preparación del Sistema
+
+Actualizar el sistema: Asegúrate de que tu sistema esté actualizado. Abre una terminal y ejecuta:
+
+sudo apt update
+sudo apt upgrade -y
+Instalar dependencias: Webmin necesita algunas dependencias básicas, aunque apt suele manejarlas. wget y apt-transport-https son clave para añadir el repositorio.
+
+sudo apt install wget apt-transport-https gnupg2 software-properties-common -y
+Paso 2: Instalación de Webmin
+
+Utilizaremos el método recomendado que es añadir el repositorio oficial de Webmin para que las actualizaciones se manejen fácilmente con apt.
+
+Importar la Clave GPG de Webmin: Esto verifica la autenticidad de los paquetes de Webmin.
+
+wget -qO- http://www.webmin.com/jcameron-key.asc | sudo gpg --dearmor -o /usr/share/keyrings/webmin.gpg
+Añadir el Repositorio de Webmin: Crea un archivo de lista de fuentes para Webmin.
+
+sudo nano /etc/apt/sources.list.d/webmin.list
+Pega la siguiente línea dentro del archivo:
+
+deb [signed-by=/usr/share/keyrings/webmin.gpg] http://download.webmin.com/download/repository sarge contrib
+Guarda el archivo (Ctrl+O, Enter) y cierra nano (Ctrl+X).
+
+Actualizar la Lista de Paquetes: Ahora que el repositorio está añadido, actualiza la lista de paquetes de apt.
+
+sudo apt update
+Instalar Webmin: Instala el paquete de Webmin.
+
+sudo apt install webmin -y
+El proceso de instalación iniciará automáticamente el servicio de Webmin.
+
+Paso 3: Acceder a Webmin
+
+Abre tu navegador web.
+Navega a la dirección https://<TU_DIRECCION_IP_DEL_SERVIDOR>:10000 (reemplaza <TU_DIRECCION_IP_DEL_SERVIDOR> con la IP real de tu máquina Debian).
+Advertencia de Seguridad: Tu navegador mostrará una advertencia sobre un certificado SSL no confiable. Esto es normal porque Webmin usa un certificado autofirmado por defecto. Procede a aceptar el riesgo y continuar (la opción varía según el navegador: "Avanzado", "Aceptar el riesgo y continuar", etc.).
+Login: Ingresa con tu usuario root y su contraseña, o con un usuario que tenga privilegios sudo.
+Paso 5: Explorar las Opciones de Administración en Webmin
+
+Una vez dentro de Webmin, verás un panel a la izquierda con categorías y módulos. Aquí te muestro cómo realizar las tareas específicas que solicitaste:
+
+1. Administración de Usuarios: Crear y Eliminar
+Ubicación: En el menú izquierdo, ve a System -> Users and Groups.
+Crear Usuario:
+Haz clic en el enlace "Create a new user".
+Rellena los campos obligatorios:
+Username: Nombre del nuevo usuario (ej: testuser).
+User ID: Déjalo en "Automatic".
+Real name: Nombre completo o descripción (ej: Usuario de Prueba).
+Home directory: Déjalo en "Automatic" o especifica uno.
+Shell: Selecciona un shell (ej: /bin/bash).
+Password: Elige "Normal password" y escribe una contraseña segura dos veces.
+Primary group: Puedes dejarlo en "New group with same name as user" o seleccionar uno existente.
+Haz clic en el botón "Create" al final de la página.
+Eliminar Usuario:
+En la página principal de "Users and Groups", busca y selecciona la casilla de verificación junto al usuario que deseas eliminar (ej: testuser).
+Haz clic en el botón "Delete Selected Users".
+Confirma la acción si se te solicita (puede preguntar si quieres eliminar también su grupo principal o su directorio home).
+
+2. Gestión de Servicios: Iniciar, Detener y Reiniciar SSH
+Ubicación: En el menú izquierdo, ve a System -> Bootup and Shutdown.
+Encontrar el Servicio SSH: Desplázate hacia abajo en la lista de "System Services (init)" o "System Services (systemd)" (dependiendo de cómo esté configurado) hasta que encuentres ssh o sshd.
+Gestionar el Servicio:
+Selecciona la casilla de verificación junto a sshd.
+Usa los botones en la parte inferior de la lista:
+Start Selected Services: Para iniciar el servicio si está detenido.
+Stop Selected Services: Para detener el servicio si está en ejecución.
+Restart Selected Services: Para detener y luego iniciar el servicio.
+Haz clic en el botón correspondiente a la acción que deseas realizar.
+
+3. Configuración de Red: Configurar IP Estática
+Ubicación: En el menú izquierdo, ve a Networking -> Network Configuration.
+Seleccionar Interfaz: Haz clic en "Network Interfaces". Verás una lista de tus interfaces de red (ej: eth0, ens18). Haz clic en el nombre de la interfaz activa que deseas configurar.
+Configurar IP Estática:
+Busca la sección "IPv4 address" o similar.
+Cambia la opción de "DHCP" a "Static configuration" (o similar).
+Rellena los campos:
+IPv4 address: La dirección IP estática que deseas asignar (ej: 192.168.1.100).
+Netmask: La máscara de subred (ej: 255.255.255.0).
+Broadcast: Déjalo en "Automatic" o calcúlalo si es necesario.
+Importante: Necesitas configurar también la puerta de enlace (Gateway). Vuelve a la página de "Network Configuration" y haz clic en "Routing and Gateways".
+Asegúrate de que la "Default route device" (o similar) sea tu interfaz configurada.
+Introduce la dirección IP de tu Gateway (la IP de tu router, ej: 192.168.1.1).
+DNS: Puedes configurar los servidores DNS en Networking -> Network Configuration -> Hostname and DNS Client. Añade las IPs de los servidores DNS (ej: 8.8.8.8, 1.1.1.1) en el campo "DNS servers".
+Aplicar Cambios:
+Después de configurar la IP y la puerta de enlace/DNS, busca un botón como "Save and Apply" o "Apply Configuration" en las páginas correspondientes.
+¡Advertencia! Si estás conectado remotamente a través de la IP que estás cambiando, ¡perderás la conexión! Es más seguro hacer esto desde la consola física o a través de otra interfaz de red.
+
+4. Administración de Software: Actualizar, Instalar y Eliminar
+Ubicación: En el menú izquierdo, ve a System -> Software Packages.
+Actualizar Paquetes:
+Busca una sección o botón que diga "Package Updates" o "Update selected packages". A menudo, hay una opción para "Update all packages" o para seleccionar y actualizar paquetes específicos listados como disponibles para actualizar. Sigue las instrucciones en pantalla. También puedes usar la opción "APT" si está disponible para refrescar y actualizar.
+Instalar Paquete:
+En la sección "Install a New Package", asegúrate de que la opción "Package from APT" (o similar) esté seleccionada.
+Escribe el nombre del paquete que deseas instalar en el campo de texto (ej: htop).
+Haz clic en el botón "Install". Webmin mostrará la salida del proceso de instalación.
+Eliminar Paquete:
+Usa el campo "Search for package" para encontrar el paquete que deseas eliminar (ej: htop). Haz clic en "Search".
+Haz clic en el nombre del paquete en los resultados de la búsqueda.
+En la página de detalles del paquete, haz clic en el botón "Uninstall" o "Remove".
+Confirma la acción. Puede preguntarte si deseas eliminar también las dependencias que ya no se necesiten (purge/autoremove).
+
+5. Gestión de Archivos y Directorios: Explorar, Editar y Eliminar
+Ubicación: En el menú izquierdo, ve a Others -> File Manager. (A veces puede estar en Tools -> File Manager).
+Explorar: Usa la interfaz del administrador de archivos para navegar por el sistema de archivos. Haz doble clic en las carpetas para abrirlas.
+Editar un Archivo:
+Navega hasta el directorio que contiene el archivo de texto que deseas editar (ej: /etc/motd).
+Haz clic derecho sobre el archivo o selecciónalo y busca un botón/icono de "Edit".
+Se abrirá un editor de texto en el navegador. Realiza tus cambios.
+Haz clic en el botón "Save" para guardar los cambios.
+Eliminar un Archivo/Directorio:
+Navega hasta el archivo o directorio que deseas eliminar.
+Haz clic derecho sobre él o selecciónalo y busca un botón/icono de "Delete".
+Confirma la eliminación cuando se te solicite. ¡Ten cuidado al eliminar archivos del sistema!
+
+6. Monitorización del Sistema: Supervisar Rendimiento
+Ubicación Principal: El Dashboard (Panel de Control) que se muestra al iniciar sesión en Webmin suele contener información clave.
+CPU Load: Muestra la carga promedio del procesador.
+Memory Usage: Indica cuánta memoria RAM y Swap se están utilizando.
+Disk Space: Muestra el uso del espacio en disco en las particiones montadas.
+Información Adicional:
+System -> Running Processes: Para ver los procesos en ejecución y su consumo de recursos.
+Hardware -> System Information (o módulos específicos como CPU, Memory): Para obtener detalles más específicos del hardware y su estado.
+Webmin -> Webmin Actions Log: Para ver quién ha hecho qué en Webmin.
+
+==================================================================================
+Comandos usados practica 2
+==================================================================================
+
+# 1. Crear un directorio llamado 'terraform-do'
+mkdir terraform-do
+
+# 2. Entrar al nuevo directorio creado
+cd terraform-do/
+
+# 3. Verificar el contenido del directorio (debe estar vacío al inicio)
+ls
+
+# 4. Generar una nueva llave SSH (útil para acceder a la VM que se creará)
+ssh-keygen
+
+# 5. Mostrar la llave pública recién generada (se usará en DigitalOcean)
+cat /home/maxwell20241209/.ssh/id_rsa.pub
+
+# 6. Verificar de nuevo el contenido del directorio
+ls
+
+# 7. Crear y editar el archivo principal de configuración de Terraform
+nano main.tf
+
+# 8. Inicializar el proyecto Terraform (descarga plugins y configura el entorno)
+terraform init
+
+# 9. Validar que la sintaxis del archivo main.tf sea correcta
+terraform validate
+
+# 10. Aplicar la configuración y desplegar la máquina virtual en DigitalOcean
+terraform apply
+
+# 11. Conectarse por SSH a la nueva VM usando la IP pública proporcionada
+ssh root@[IP_DIGITAL_OCEAN]
+
+
+[Contenido del archivo main.tf]
+
+# Se indica que se usará el proveedor 'digitalocean' y su versión
+terraform {
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "~> 2.0"
+    }
+  }
+}
+
+# Autenticación con DigitalOcean mediante un token personal
+provider "digitalocean" {
+  token = "TU_API_TOKEN"
+}
+
+# Se define el recurso principal: una Droplet (VM) de Ubuntu 22.04
+resource "digitalocean_droplet" "OS3vm" {
+  image  = "ubuntu-22-04-x64"          # Imagen del sistema operativo
+  name   = "OS3vm"                     # Nombre que tendrá la VM
+  region = "nyc1"                      # Región del datacenter
+  size   = "s-1vcpu-1gb"               # Tamaño de la VM (CPU y RAM)
+  ssh_keys = [var.ssh_fingerprint]     # Se asocia la llave pública SSH
+}
+
+# Se declara la variable 'ssh_fingerprint', que debe contener la huella de la clave pública
+variable "ssh_fingerprint" {
+  default = "TU_LLAVE_PUBLICA_FINGERPRINT"
+}
+
+# Al finalizar, se muestra la IP pública de la VM creada
+output "vm_ip" {
+  value = digitalocean_droplet.OS3vm.ipv4_address
+}
+
+
+
+
+==================================================================================
+Comandos usados practica 3
+==================================================================================
+
+
+
+
+Crear directorio de configuración de Ansible:
+sudo mkdir -p /etc/ansible
+cd /etc/ansible
+sudo nano ansible.cfg
+Modificar el archivo ansible.cfg: Este archivo contiene configuraciones clave para la ejecución de Ansible. Asegúrate de configurarlo adecuadamente para trabajar con SSH y claves privadas.
+[defaults]
+inventory = /etc/ansible/hosts
+private_key_file = /home/maxwell20241208/.ssh/id_rsa
+host_key_checking = False
+ask become pass = True
+
+[ssh_connection]
+ssh_args = -o ForwardAgent=yes -o ControlMaster=auto -o ControlPersist=60s
+    
+    
+Paso 2: Configuración de Inventario de Ansible
+
+
+sudo nano hosts
+
+Define los nodos que Ansible gestionará. En este archivo se agregan las IPs de tus servidores Windows y Linux, junto con sus credenciales de acceso.
+
+Archivo hosts:
+
+[win]
+[IP_MQUINA_WINDOWS]
+
+[win:vars]
+ansible_user=ansible
+ansible_password=1234
+ansible_port=5985
+ansible_connection=winrm
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+
+[linux]
+[IP_MAQUINA_DIGITAL_OCEAN]
+
+[linux:vars]
+ansible_user=ansible
+ansible_ssh_private_key_file= ~/.ssh/id_rsa
+ansible_become_password=1234
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+
+2. Generación de Claves SSH
+Las claves SSH son fundamentales para permitir la autenticación sin necesidad de contraseñas. Crea una nueva clave SSH con el siguiente comando:
+
+ssh-keygen -t rsa -b 4098
+
+Luego, asegúrate de copiar la clave pública generada al archivo authorized_keys en los servidores remotos para permitir la autenticación sin contraseña.
+
+3. Configuración en el Cliente DigitalOcean
+Paso 1: Crear y Configurar Usuario Ansible en Linux
+En el cliente Linux (DigitalOcean), configura un nuevo usuario ansible que tendrá acceso para ejecutar tareas remotas.
+
+sudo useradd -m ansible
+sudo usermod -aG sudo ansible
+sudo chsh -s /bin/bash ansible
+Luego, configura el acceso SSH creando el directorio .ssh y el archivo authorized_keys para la autenticación.
+
+
+sudo mkdir -p /home/ansible/.ssh
+sudo touch /home/ansible/.ssh/authorized_keys
+sudo chmod 600 /home/ansible/.ssh/authorized_keys
+sudo chown ansible:ansible /home/ansible/.ssh/authorized_keys
+sudo nano /home/ansible/.ssh/authorized_keys
+para verificar:
+
+ssh ansible@[IP_DIGITAL_OCEAN]
+
+Paso 2: Verificar Conexión con Ansible
+Prueba la conexión entre el servidor Debian y el cliente Linux utilizando el comando ping de Ansible:
+
+
+ansible linux -m ping -u ansible
+
+CORRER EL SIGUIENTE SCRIPT EN EL CLIENTE WINDOWS EN UNA POWERSHELL COMO ADMINISTRADOR
+
+Set-ExecutionPolicy RemoteSigned -Force
+Enable-PSRemoting -Force
+Set-Item WSMan:\localhost\Service\AllowUnencrypted -Value $true
+Set-Item WSMan:\localhost\Service\Auth\Basic -Value $true
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value '*' -Force
+netsh advfirewall firewall add rule name="WinRM HTTP" dir=in action=allow protocol=TCP localport=5985
+netsh advfirewall firewall set rule group="Administración remota de Windows" new enable=yes
+Restart-Service WinRM
+$Password = ConvertTo-SecureString "1234" -AsPlainText -Force
+New-LocalUser -Name "ansible" -Password $Password -FullName "Ansible User" -Description "Usuario Ansible"
+Add-LocalGroupMember -Group "Administradores" -Member "ansible"
+winrm enumerate winrm/config/listener
+Test-NetConnection -ComputerName localhost -Port 5985
+
+Paso 2: Verificar Conexión con Ansible
+Prueba la conexión entre el servidor Debian y el cliente WIN utilizando el comando ping de Ansible
+
+ansible win -m win_ping 
+
+Este comando debería devolver un resultado positivo si la conexión SSH es exitosa.
+
+
+==================================================================================
+Comandos usados practica 4
+==================================================================================
+
+CORRER LOS SIGUIENTES COMANDOS PARA COMPROBAR SI ANSIBLE ESTA EN FUNCIONAMIENTO 
+
+ansible linux -m ping -u ansible
+ansible win -m win_ping 
+
+1. Usando el módulo win_copy para copiar un archivo .txt desde el escritorio a Documentos (en la máquina ansible2):
+
+ansible win -i /etc/ansible/hosts -m win_shell -a "Move-Item -Path 'C:/Users/thewhite/Desktop/archivo.txt' -Destination 'C:/Users/thewhite/Documents/'"
+
+Asegúrate de reemplazar Usuario con el nombre real del usuario en la máquina Windows (ansible2), y que el archivo exista en esa ruta.
+
+2. Usando el módulo reboot para reiniciar la máquina ansible1:
+
+ansible linux -i /etc/ansible/hosts -m reboot --become
+
+[WARNING]
+
+SI EL CLIENTE LINUX NO RESPONDE AGREGAR LO SIGUIENTE 
+
+sudo visudo 
+
+debajo del todo del archivo agregar lo siguiente:
+
+ansible ALL=(ALL) NOPASSWD: ALL
+
+==================================================================================
+Comandos usados practica 5
+==================================================================================
+
+
+ install_notepad.yml — Instalar Notepad++ en Windows
+
+sudo nano install_notepad.yml
+
+# install_notepad.yml
+- name: Descargar e instalar Notepad++ en Windows 10
+  hosts: win
+  gather_facts: no
+  tasks:
+    - name: Descargar instalador de Notepad++
+      win_get_url:
+        url: https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.5.3/npp.8.5.3.Installer.x64.exe
+        dest: C:\Users\thewhite\Downloads\npp_installer.exe
+
+    - name: Ejecutar el instalador de Notepad++ en modo silencioso
+      win_package:
+        path: C:\Users\thewhite\Downloads\npp_installer.exe
+        arguments: /S
+        state: present
+
+Este playbook descarga el instalador directamente y lo ejecuta en modo silencioso (/S).
+
+Ejecútalo con:
+
+ansible-playbook install_notepad.yml
+
+
+actualizar_repos_linux.yml — Actualizar repositorios en Ubuntu
+
+sudo nano actualizar_repos_linux.yml
+
+# actualizar_repos_linux.yml
+- name: Actualizar repositorios APT en ansible1
+  hosts: linux
+  become: yes
+  tasks:
+    - name: Ejecutar apt update
+      apt:
+        update_cache: yes
+
+Ejecútalo con:
+
+ansible-playbook actualizar_repos_linux.yml --ask-become-pass
