@@ -131,6 +131,27 @@ Webmin -> Webmin Actions Log: Para ver quién ha hecho qué en Webmin.
 ==================================================================================
 Comandos usados practica 2 - Desplieque de una VM con terraform en digital Ocean
 ==================================================================================
+PASOS PARA INSTALAR TERRAFORM
+1- sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
+
+2- wget -O- https://apt.releases.hashicorp.com/gpg | \
+gpg --dearmor | \
+sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+
+
+3- gpg --no-default-keyring \
+--keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+--fingerprint
+
+
+4- echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+
+5- sudo apt update
+
+6- sudo apt-get install terraform
 
 # 1. Crear un directorio llamado 'terraform-do'
 mkdir terraform-do
@@ -153,18 +174,6 @@ ls
 # 7. Crear y editar el archivo principal de configuración de Terraform
 nano main.tf
 
-# 8. Inicializar el proyecto Terraform (descarga plugins y configura el entorno)
-terraform init
-
-# 9. Validar que la sintaxis del archivo main.tf sea correcta
-terraform validate
-
-# 10. Aplicar la configuración y desplegar la máquina virtual en DigitalOcean
-terraform apply
-
-# 11. Conectarse por SSH a la nueva VM usando la IP pública proporcionada
-ssh root@[IP_DIGITAL_OCEAN]
-
 
 [Contenido del archivo main.tf]
 
@@ -180,7 +189,7 @@ terraform {
 
 # Autenticación con DigitalOcean mediante un token personal
 provider "digitalocean" {
-  token = "TU_API_TOKEN"
+  token = "TU_API_TOKEN_DE_TERRAFORM"
 }
 
 # Se define el recurso principal: una Droplet (VM) de Ubuntu 22.04
@@ -194,13 +203,26 @@ resource "digitalocean_droplet" "OS3vm" {
 
 # Se declara la variable 'ssh_fingerprint', que debe contener la huella de la clave pública
 variable "ssh_fingerprint" {
-  default = "TU_LLAVE_PUBLICA_FINGERPRINT"
+  default = "TU_LLAVE_PUBLICA_FINGERPRINT_DE_TERRAFORM"
 }
 
 # Al finalizar, se muestra la IP pública de la VM creada
 output "vm_ip" {
   value = digitalocean_droplet.OS3vm.ipv4_address
 }
+
+# 8. Inicializar el proyecto Terraform (descarga plugins y configura el entorno)
+terraform init
+
+# 9. Validar que la sintaxis del archivo main.tf sea correcta
+terraform validate
+
+# 10. Aplicar la configuración y desplegar la máquina virtual en DigitalOcean
+terraform apply
+
+# 11. Conectarse por SSH a la nueva VM usando la IP pública proporcionada
+ssh root@[IP_DIGITAL_OCEAN]
+
 
 
 
@@ -209,7 +231,7 @@ output "vm_ip" {
 Comandos usados practica 3 - Instalación de Ansible 
 ==================================================================================
 
-
+sudo apt install ansible
 
 
 Crear directorio de configuración de Ansible:
@@ -258,7 +280,7 @@ ansible_become_password=1234
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
 
-2. Generación de Claves SSH
+2. Generación de Claves SSH en la maquina linux principal
 Las claves SSH son fundamentales para permitir la autenticación sin necesidad de contraseñas. Crea una nueva clave SSH con el siguiente comando:
 
 ssh-keygen -t rsa -b 4098
@@ -272,6 +294,7 @@ En el cliente Linux (DigitalOcean), configura un nuevo usuario ansible que tendr
 sudo useradd -m ansible
 sudo usermod -aG sudo ansible
 sudo chsh -s /bin/bash ansible
+
 Luego, configura el acceso SSH creando el directorio .ssh y el archivo authorized_keys para la autenticación.
 
 
@@ -280,6 +303,7 @@ sudo touch /home/ansible/.ssh/authorized_keys
 sudo chmod 600 /home/ansible/.ssh/authorized_keys
 sudo chown ansible:ansible /home/ansible/.ssh/authorized_keys
 sudo nano /home/ansible/.ssh/authorized_keys
+
 para verificar:
 
 ssh ansible@[IP_DIGITAL_OCEAN]
@@ -289,6 +313,16 @@ Prueba la conexión entre el servidor Debian y el cliente Linux utilizando el co
 
 
 ansible linux -m ping -u ansible
+
+CONFIGURANCION DEL FIREWALL EN WINDOWS
+
+CTRL+R > wf.msc > 
+
+activar las siguientes reglas de entrada:
+**Administracion remota de registro de eventos (NP de entrada)**
+**Administracion remota de registro de entrada (NP de entrada)**
+dejar la diguiente sin abilitar y la siguiente se activa
+
 
 CORRER EL SIGUIENTE SCRIPT EN EL CLIENTE WINDOWS EN UNA POWERSHELL COMO ADMINISTRADOR
 
