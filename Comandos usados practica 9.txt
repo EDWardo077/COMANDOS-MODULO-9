@@ -1,4 +1,4 @@
-Comandos usados practica 1
+Comandos usados practica 1 - Instalacion de Webmin 
 
 ==================================================================================
 
@@ -129,7 +129,7 @@ Hardware -> System Information (o módulos específicos como CPU, Memory): Para 
 Webmin -> Webmin Actions Log: Para ver quién ha hecho qué en Webmin.
 
 ==================================================================================
-Comandos usados practica 2
+Comandos usados practica 2 - Desplieque de una VM con terraform en digital Ocean
 ==================================================================================
 
 # 1. Crear un directorio llamado 'terraform-do'
@@ -206,7 +206,7 @@ output "vm_ip" {
 
 
 ==================================================================================
-Comandos usados practica 3
+Comandos usados practica 3 - Instalación de Ansible 
 ==================================================================================
 
 
@@ -315,7 +315,7 @@ Este comando debería devolver un resultado positivo si la conexión SSH es exit
 
 
 ==================================================================================
-Comandos usados practica 4
+Comandos usados practica 4 -  Comandos Ad-Hoc
 ==================================================================================
 
 CORRER LOS SIGUIENTES COMANDOS PARA COMPROBAR SI ANSIBLE ESTA EN FUNCIONAMIENTO 
@@ -344,7 +344,7 @@ debajo del todo del archivo agregar lo siguiente:
 ansible ALL=(ALL) NOPASSWD: ALL
 
 ==================================================================================
-Comandos usados practica 5
+Comandos usados practica 5 - Playbooks 
 ==================================================================================
 
 
