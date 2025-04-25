@@ -425,3 +425,87 @@ sudo nano actualizar_repos_linux.yml
 Ejecútalo con:
 
 ansible-playbook actualizar_repos_linux.yml --ask-become-pass
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+por si acaso
+
+# Se indica que se usará el proveedor 'digitalocean' y su versión
+terraform {
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "~> 2.0"
+    }
+  }
+}
+
+# Autenticación con DigitalOcean mediante un token personal
+provider "digitalocean" {
+  token = "TU_API_TOKEN_DE_TERRAFORM"
+}
+
+# Se define el recurso principal: una Droplet (VM) de Ubuntu 22.04
+resource "digitalocean_droplet" "OS3vm" {
+  image      = "ubuntu-22-04-x64"
+  name       = "OS3vm"
+  region     = "nyc1"
+  size       = "s-1vcpu-1gb"
+  ssh_keys   = [var.ssh_fingerprint]
+}
+
+# Firewall que habilita los puertos 22, 80, 443 y 445
+resource "digitalocean_firewall" "OS3vm_firewall" {
+  name = "OS3vm-firewall"
+
+  droplet_ids = [digitalocean_droplet.OS3vm.id]
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "22"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "80"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "443"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "445"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  outbound_rule {
+    protocol         = "tcp"
+    port_range       = "all"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  outbound_rule {
+    protocol         = "udp"
+    port_range       = "all"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+}
+
+# Variable para la huella digital de la clave SSH
+variable "ssh_fingerprint" {
+  default = "TU_LLAVE_PUBLICA_FINGERPRINT_DE_TERRAFORM"
+}
+
+# Output con la IP pública de la VM
+output "vm_ip" {
+  value = digitalocean_droplet.OS3vm.ipv4_address
+}
+
+
+
